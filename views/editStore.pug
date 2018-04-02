@@ -1,0 +1,10 @@
+extends layout
+
+//- can use all the functions defined in _storeForm.pug
+include mixins/_storeForm
+
+block content
+    .inner
+        h2= title
+        //- use function from mixin
+        +storeForm(store)
