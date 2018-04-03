@@ -4,11 +4,11 @@ const promisify = require('es6-promisify');
 
 exports.loginForm = (req, res) => {
     res.render('login', { title: 'Login' });
-}
+};
 
 exports.registerForm = (req, res) => {
     res.render('register', { title: 'Register' });
-}
+};
 
 exports.validateRegister = (req, res, next) => {
     // removes all kind of possible scripts from the body
@@ -33,7 +33,7 @@ exports.validateRegister = (req, res, next) => {
         return; // stop the fn from running
     }
     next(); // no errors, call the next middleware on the line
-}
+};
 
 exports.register = async (req, res, next) => {
     const user = new User({ email: req.body.email, name: req.body.name });
@@ -42,3 +42,7 @@ exports.register = async (req, res, next) => {
     await registerWithPromise(user, req.body.password);
     next(); // pass to authController.login
 };
+
+exports.account = (req, res) => {
+    res.render('account', { title: 'Edit your account' });
+}
