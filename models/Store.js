@@ -41,6 +41,12 @@ const storeSchema = new mongoose.Schema({
     }
 });
 
+// Define our indexes - to fasten up search
+storeSchema.index({
+    name: 'text', // indexing it as text
+    description: 'text'
+});
+
 // runs before saving an entry
 storeSchema.pre('save', async function(next) {
     if (!this.isModified('name')) {
