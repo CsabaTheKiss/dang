@@ -33,7 +33,12 @@ const storeSchema = new mongoose.Schema({
             required: 'You must supply an address!'
         }
     },
-    photo: String
+    photo: String,
+    author: {
+        type: mongoose.Schema.ObjectId,
+        ref: 'User', // reference the User
+        requiered: 'You must supply an author'
+    }
 });
 
 // runs before saving an entry
