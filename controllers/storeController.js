@@ -47,6 +47,7 @@ exports.resize = async (req, res, next) => {
 // async await ES8 feature
 // async tag means: inside this function is an async stuff
 exports.createStore = async (req, res) => {
+  req.body.author = req.user._id;
   // waiting for the promise to be able to access slug, see below
   const store = await (new Store(req.body)).save();
   req.flash('success', `Successfully created ${store.name}. Care to leave a review?`);
@@ -58,11 +59,17 @@ exports.getStores = async (req, res) => {
   res.render('stores', { title: 'Stores', stores });
 };
 
+const confirmOwner = (store, user) => {
+  if (!store.author.equals(user._id)) { // equals: to compare ObjectId type values
+    throw Error('You must own a store in order to edit it!');
+  }
+};
+
 exports.editStore = async (req, res) => {
   // 1 find the store for the given ID
   const store = await Store.findOne({ _id: req.params.id });
   // 2 confirm they are the owner of the store
-  // TODO
+  confirmOwner(store, req.user);
   // 3 reder out the edit form so the user can update thier store
   res.render('editStore', { title: `Edit ${store.name}`, store });
 };
@@ -81,7 +88,9 @@ exports.updateStore = async (req, res) => {
 };
 
 exports.getStoreBySlug = async (req, res, next) => {
-  const store = await Store.findOne({ slug: req.params.slug });
+  const store = await Store
+    .findOne({ slug: req.params.slug })
+    .populate('author'); // populating author field, as it's only a reference to user _id
   if (!store) {
     next(); // will pass control to the next middleware, which is not found error
     return;
