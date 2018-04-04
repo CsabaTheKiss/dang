@@ -23,6 +23,12 @@ const userSchema = new Schema({
     }
 });
 
+// not stored, just a virtual field
+userSchema.virtual('gravatar').get(function() {
+    const hash = md5(this.email);
+    return `https://gravatar.com/avatar/${hash}?s=200`;
+});
+
 // adding authetincation to the Schema, using email address for auth.
 userSchema.plugin(passportLocalMongoose, { usernameField: 'email' });
 // 'unique' gives ugly errors, this one adds much nicer errors for that

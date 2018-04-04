@@ -1,15 +1,17 @@
 const mongoose = require('mongoose');
+const User = mongoose.model('User');
+const promisify = require('es6-promisify');
 
 exports.loginForm = (req, res) => {
     res.render('login', { title: 'Login' });
-}
+};
 
 exports.registerForm = (req, res) => {
     res.render('register', { title: 'Register' });
-}
+};
 
 exports.validateRegister = (req, res, next) => {
-    // removes all king of possible scripts from the body
+    // removes all kind of possible scripts from the body
     req.sanitizeBody('name');
     req.checkBody('name', 'You must supply a name!').notEmpty();
     req.checkBody('email', 'That Email is not valid!').isEmail();
@@ -31,4 +33,32 @@ exports.validateRegister = (req, res, next) => {
         return; // stop the fn from running
     }
     next(); // no errors, call the next middleware on the line
+};
+
+exports.register = async (req, res, next) => {
+    const user = new User({ email: req.body.email, name: req.body.name });
+    // User.register would be callback based, using promisify to make it Promise based 
+    const registerWithPromise = promisify(User.register, User);
+    await registerWithPromise(user, req.body.password);
+    next(); // pass to authController.login
+};
+
+exports.account = (req, res) => {
+    res.render('account', { title: 'Edit your account' });
 }
+
+exports.updateAccount = async (req, res) => {
+    const updates = {
+        name: req.body.name,
+        email: req.body.email
+    };
+
+    const user = await User.findOneAndUpdate(
+        { _id: req.user._id }, // query
+        { $set: updates }, // updates
+        { new: true, runValidators: true,  context: 'query'} // options
+    );
+
+    req.flash('success', 'Updated the profile!');
+    res.redirect('back');
+};

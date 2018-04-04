@@ -1,6 +1,9 @@
 ## What is this?
 
-Just you wait folks!
+A home project for learning node.js thanks to Wes Bos!
+Check his site, he has a lot of useful stuff there.
+
+Peace!
 
 ## Sample Data
 
