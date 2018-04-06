@@ -22,7 +22,10 @@ const userSchema = new Schema({
         trim: true
     },
     resetPasswordToken: String,
-    resetPasswordExpires: Date
+    resetPasswordExpires: Date,
+    hearts: [
+        { type: mongoose.Schema.ObjectId, ref: 'Store' }
+    ]
 });
 
 // not stored in DB, just a virtual field

@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 const Store = mongoose.model('Store');
+const User = mongoose.model('User');
 const multer = require('multer');
 const jimp = require('jimp'); // for photo resize
 const uuid = require('uuid'); // uniq ids for photo names
@@ -150,3 +151,17 @@ exports.mapStores = async (req, res) => {
 exports.mapPage = (req, res) => {
   res.render('map', { title: 'Map' });
 }
+
+// to heart / unheart a store
+exports.heartStore = async (req, res) => {
+  const hearts = req.user.hearts.map(obj => obj.toString());
+  // $pull: remove from DB
+  // $addToSet: ads a unique element to the DB - $push would ignore it, and would at it multiple times
+  const mongoDBoperator = hearts.includes(req.params.id) ? '$pull' : '$addToSet';
+  const user = await User
+    .findByIdAndUpdate(req.user._id,
+      { [mongoDBoperator]: { hearts: req.params.id } }, // computed property: ES6 feature
+      { new: true } // with this it will return the updated user
+  );
+  res.json(user);
+};
